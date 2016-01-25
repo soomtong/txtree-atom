@@ -1,0 +1,23 @@
+{
+  "name": "txtree-atom",
+  "main": "./lib/txtree-atom",
+  "version": "0.0.0",
+  "description": "Txtree Anonymous Document Hosting",
+  "keywords": [
+    "txtree",
+    "anonymous",
+    "text",
+    "hosting"
+  ],
+  "activationCommands": {
+    "atom-workspace": "txtree:publish"
+  },
+  "repository": "https://github.com/soomtong/txtree-atom",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {
+    "atom-notify": "^1.1.0"
+  }
+}
