@@ -9,5 +9,6 @@ Todo
 ----
 
 -	[x] HTTP request
--	[ ] Assign title
+-	[x] Assign title
+-	[ ] Check it for markdown
 -	[ ] Assign end of document time
