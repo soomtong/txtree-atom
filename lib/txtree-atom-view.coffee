@@ -1,25 +1,58 @@
+# referenced from https://github.com/atom/go-to-line/
+{$, TextEditorView, View}  = require 'atom-space-pen-views'
+
 module.exports =
-class TxtreeAtomView
-  constructor: (serializedState) ->
-    # Create root element
-    @element = document.createElement('div')
-    @element.classList.add('txtree-atom')
+class TxtreeAtomView extends View
+  @activate: ->
+    new TxtreeAtomView
 
-    # Create message element
-    message = document.createElement('div')
-    message.textContent = "The TxtreeAtom package is Alive! It's ALIVE!"
-    message.classList.add('message')
-    @element.appendChild(message)
+  @content: ->
+    @div class: 'txtree-atom', =>
+      @h4 class: 'title', "Publish to Txtree - Anonymous Text Hosting Service"
+      @subview 'miniEditor', new TextEditorView(mini: true)
+      @div class: 'description', "Assign this document's title if you wants"
+      # @div class: 'description', outlet: 'message'
 
-  # Returns an object that can be retrieved when package is activated
-  serialize: ->
+  initialize: ->
+    @panel = atom.workspace.addModalPanel(item: this, visible: false)
+    @miniEditor.on 'blur', => @close()
 
-  # Tear down any state and detach
-  destroy: ->
-    @element.remove()
+  toggle: ->
+    if @panel.isVisible()
+      @close()
+    else
+      @open()
 
-  getElement: ->
-    @element
+  close: ->
+    return unless @panel.isVisible()
 
-  setResult: ->
-    @element
+    miniEditorFocused = @miniEditor.hasFocus()
+    @miniEditor.setText('')
+    @panel.hide()
+    @restoreFocus() if miniEditorFocused
+
+  confirm: ->
+    txtreeDocumentTitle = @miniEditor.getText()
+    editor = atom.workspace.getActiveTextEditor()
+    # console.log("submit", editor? and txtreeDocumentTitle)
+    @close()
+
+    return editor? and txtreeDocumentTitle
+
+  storeFocusElement: ->
+    @previouslyFocusedElement = $(':focus')
+
+  restoreFocus: ->
+    if @previouslyFocusedElement?.isOnDom()
+      @previouslyFocusedElement.focus()
+    else
+      atom.views.getView(atom.workspace).focus()
+
+  open: ->
+    return if @panel.isVisible()
+
+    if editor = atom.workspace.getActiveTextEditor()
+      @storeFocusElement()
+      @panel.show()
+      # @message.text("Assign this document's title if you wants")
+      @miniEditor.focus()

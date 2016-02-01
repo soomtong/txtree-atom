@@ -8,5 +8,6 @@ A short description of your package.
 Todo
 ----
 
--	[ ] 단순한 HTTP request 전송
--	[ ] 제목과 삭제 일자 지정
+-	[x] HTTP request
+-	[ ] Assign title
+-	[ ] Assign end of document time

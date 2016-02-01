@@ -1,6 +1,5 @@
 TxtreeAtomView = require './txtree-atom-view'
 RequestWrap = require './http-request'
-{CompositeDisposable} = require 'atom'
 Notify = require 'atom-notify'
 
 module.exports = TxtreeAtom =
@@ -9,31 +8,26 @@ module.exports = TxtreeAtom =
   subscriptions: null
 
   activate: (state) ->
-    @txtreeAtomView = new TxtreeAtomView(state.txtreeAtomViewState)
-    @modalPanel = atom.workspace.addModalPanel(item: @txtreeAtomView.getElement(), visible: false)
+    @txtreeAtomView = TxtreeAtomView.activate()
 
-    # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
-    @subscriptions = new CompositeDisposable
+    atom.commands.add 'atom-text-editor', 'txtree:publish', =>
+      @txtreeAtomView.toggle()
+      false
 
-    # Register command that toggles this view
-    @subscriptions.add atom.commands.add 'atom-workspace', 'txtree:publish': => @publish()
+    atom.commands.add @txtreeAtomView.miniEditor.element, 'core:confirm', => @publish()
+    atom.commands.add @txtreeAtomView.miniEditor.element, 'core:cancel', => @txtreeAtomView.close()
 
   deactivate: ->
-    @modalPanel.destroy()
-    @subscriptions.dispose()
-    @txtreeAtomView.destroy()
-
-  serialize: ->
-    txtreeAtomViewState: @txtreeAtomView.serialize()
+    console.log "deinit"
 
   publish: ->
-    @modalPanel.show()
-
     host = "https://haroocloud.com/api/tree"
+    # host = "http://localhost:3030/api/tree"
+    title = @txtreeAtomView.confirm()
     editor = atom.workspace.getActiveTextEditor()
-    fetch = RequestWrap.init()
+    request = RequestWrap.init()
 
-    fetch(host + '/doc', {
+    request(host + '/doc', {
       method: 'post',
       mode: 'cors',
       headers: {
@@ -41,17 +35,15 @@ module.exports = TxtreeAtom =
       },
       body: JSON.stringify({
         text: editor.getText()
+        title: title,
+        theme: 'text/atom'
       })
     }).then((res) ->
       notifier = Notify "Txtree"
       # console.log(res.ok)
       if res.ok
-        notifier.addSuccess "That was a blast!", timeOut: 2000
+        notifier.addSuccess "Save to Txtree operation Successed", timeOut: 2000
       else
-        notifier.addError "That was a bummer!", dismissable: false
+        notifier.addError "Save to Txtree operation Failed", dismissable: false
       # notifier.addInfo "There is air outside."
     )
-    result = 'ok'
-    # @txtreeAtomView.setResult(result)
-
-    @modalPanel.hide()
