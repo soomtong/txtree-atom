@@ -11,11 +11,23 @@ class TxtreeAtomView extends View
       @h4 class: 'title', "Publish to Txtree - Anonymous Text Hosting Service"
       @subview 'miniEditor', new TextEditorView(mini: true)
       @div class: 'description', "Assign this document's title if you wants"
-      # @div class: 'description', outlet: 'message'
+      @div class: 'btn-group btn-group-options', =>
+        @button class: 'btn selected', outlet: 'useMarkdown', 'use Markdown'
+      @div class: 'btn-group btn-group-options pull-right', =>
+        @button class: 'btn submit', outlet: 'submitForm', 'Submit'
+        @button class: 'btn', outlet: 'closePanel', 'Close'
+
 
   initialize: ->
     @panel = atom.workspace.addModalPanel(item: this, visible: false)
-    @miniEditor.on 'blur', => @close()
+
+    # @miniEditor.on 'blur', =>
+    #   console.log "lose focus in editor"
+    #   console.log @useMarkdown.hasFocus()
+    #   @close()
+
+    @useMarkdown.on 'click', =>
+      @setOptionButtonState(@useMarkdown, !@useMarkdown.hasClass('selected'))
 
   toggle: ->
     if @panel.isVisible()
@@ -24,6 +36,7 @@ class TxtreeAtomView extends View
       @open()
 
   close: ->
+    # console.log("close", @panel.isVisible())
     return unless @panel.isVisible()
 
     miniEditorFocused = @miniEditor.hasFocus()
@@ -33,11 +46,14 @@ class TxtreeAtomView extends View
 
   confirm: ->
     txtreeDocumentTitle = @miniEditor.getText()
+    txtreeDocumentOptions = {
+      useMarkdown: @useMarkdown.hasClass 'selected'
+    }
     editor = atom.workspace.getActiveTextEditor()
     # console.log("submit", editor? and txtreeDocumentTitle)
     @close()
 
-    return editor? and txtreeDocumentTitle
+    return editor? and [txtreeDocumentTitle, txtreeDocumentOptions]
 
   storeFocusElement: ->
     @previouslyFocusedElement = $(':focus')
@@ -48,11 +64,16 @@ class TxtreeAtomView extends View
     else
       atom.views.getView(atom.workspace).focus()
 
+  setOptionButtonState: (optionButton, selected) ->
+    if selected
+      optionButton.addClass 'selected'
+    else
+      optionButton.removeClass 'selected'
+
   open: ->
     return if @panel.isVisible()
 
     if editor = atom.workspace.getActiveTextEditor()
       @storeFocusElement()
       @panel.show()
-      # @message.text("Assign this document's title if you wants")
       @miniEditor.focus()

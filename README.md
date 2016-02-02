@@ -1,14 +1,14 @@
 txtree-atom package
 ===================
 
-A short description of your package.
+Txtree Atom Package
 
-![A screenshot of your package](https://f.cloud.github.com/assets/69169/2290250/c35d867a-a017-11e3-86be-cd7c5bf3ff9b.gif)
+Share your Text Content in Atom Editor with No Account, No Tracking
 
 Todo
 ----
 
 -	[x] HTTP request
 -	[x] Assign title
--	[ ] Check it for markdown
+-	[x] Check options for markdown
 -	[ ] Assign end of document time
