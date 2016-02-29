@@ -55,7 +55,7 @@ module.exports = TxtreeAtom =
       notifier = Notify "Txtree"
       # console.log(res.ok)
       if res.ok
-        notifier.addSuccess "Save to Txtree operation Successed", timeOut: 2000
+        notifier.addSuccess "Save to Txtree operation Succeed", timeOut: 2000
       else
         notifier.addError "Save to Txtree operation Failed", dismissable: false
       # notifier.addInfo "There is air outside."
